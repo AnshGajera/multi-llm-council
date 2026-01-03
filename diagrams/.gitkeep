@@ -1,0 +1,9 @@
+# Diagrams
+
+This directory contains architecture diagrams and flowcharts for the Multi-LLM Council System.
+
+## Files to Add
+
+- `architecture.png` - System architecture diagram showing the flow between LLMs and the consensus mechanism
+
+You can add your diagrams here to visualize the multi-agent workflow.

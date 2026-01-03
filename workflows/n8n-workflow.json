@@ -1,0 +1,999 @@
+{
+  "name": "LLM-Council | FINAL | End-to-End",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "LLM-Council | FINAL | End-to-End",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        144
+      ],
+      "id": "0aba9ce9-2640-4b4d-ae7f-ba5e40d61466",
+      "name": "Webhook",
+      "webhookId": "06e694d9-b301-4695-a3b2-07ca167fb877"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4ae0ff50-a344-4ab4-8111-56aaa127031c",
+              "name": "query",
+              "value": "={{ $json.body.query }}",
+              "type": "string"
+            },
+            {
+              "id": "24b63c4e-169d-4ddb-95ea-2962c7ec3f92",
+              "name": "user_id",
+              "value": "={{ $json.body.user_id || 'anonymous' }}",
+              "type": "string"
+            },
+            {
+              "id": "62645144-588b-4305-95e6-e5411435f2ab",
+              "name": "=request_id",
+              "value": "={{ $execution.id }}",
+              "type": "string"
+            },
+            {
+              "id": "14111496-a6e5-4ad6-8b28-32624a4d5ebf",
+              "name": "timestamp",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        144
+      ],
+      "id": "cd6ed876-1783-4d27-8e78-2eca53f93446",
+      "name": "Normalize Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6f35be4c-f863-4325-9ef5-c168c0a38dce",
+              "name": "request_id",
+              "value": "={{$json.request_id}}",
+              "type": "string"
+            },
+            {
+              "id": "dd85bb8e-0e64-4d55-8d7c-9663d3c816ff",
+              "name": "query",
+              "value": "={{$json.query}}",
+              "type": "string"
+            },
+            {
+              "id": "7e9070cb-6fef-4aff-8a44-c5b5b917f0bc",
+              "name": "base_prompt",
+              "value": "You are an expert AI assistant. Answer the question clearly and accurately.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        144
+      ],
+      "id": "db941f11-d380-43d7-a0c4-38af677679ba",
+      "name": "Prepare Prompt"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{$json.system_prompt}}\n\nQuestion:\n{{$json.query}}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        16
+      ],
+      "id": "abd856bb-034d-4641-9602-e4c65cdd7bec",
+      "name": "LLM_B_GEMINI",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8xdT4Vk3AlUUOadi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2876bf59-675e-4ad9-a65e-6d8b23e5a789",
+              "name": "request_id",
+              "value": "={{ $node[\"Normalize Input\"].json.request_id }}\n",
+              "type": "string"
+            },
+            {
+              "id": "0cf7d369-b514-43d0-b90d-1e4b1a0f3bd4",
+              "name": "model_id",
+              "value": "\"gemini\"",
+              "type": "string"
+            },
+            {
+              "id": "dd60469e-7ec2-453c-a6ff-3ab12b6d1d40",
+              "name": "content",
+              "value": "={{ $json.content.parts[0].text }}\n",
+              "type": "string"
+            },
+            {
+              "id": "15cfdf1b-3150-412c-8940-53dbaddeb559",
+              "name": "stage",
+              "value": "\"generation\"",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        16
+      ],
+      "id": "3f03829e-7809-4bf7-8d1c-ca7d551f4936",
+      "name": "Normalize Gemini"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2876bf59-675e-4ad9-a65e-6d8b23e5a789",
+              "name": "request_id",
+              "value": "={{ $node[\"Normalize Input\"].json.request_id }}\n",
+              "type": "string"
+            },
+            {
+              "id": "0cf7d369-b514-43d0-b90d-1e4b1a0f3bd4",
+              "name": "model_id",
+              "value": "\"ollama_llama3_1\"",
+              "type": "string"
+            },
+            {
+              "id": "dd60469e-7ec2-453c-a6ff-3ab12b6d1d40",
+              "name": "content",
+              "value": "={{ $json.content }}\n",
+              "type": "string"
+            },
+            {
+              "id": "15cfdf1b-3150-412c-8940-53dbaddeb559",
+              "name": "stage",
+              "value": "\"generation\"",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        304
+      ],
+      "id": "2a35fc30-6383-459b-934c-92a8674ee07e",
+      "name": "Normalize Ollama"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "llama3.1:latest",
+          "mode": "list",
+          "cachedResultName": "llama3.1:latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{$json.system_prompt}}\n",
+              "role": "assistant"
+            },
+            {
+              "content": "={{$json.query}}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        528,
+        304
+      ],
+      "id": "754cd9ef-97cd-4fcd-a072-d245d99abf75",
+      "name": "LLM_C_OLLAMA",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0dxlKkFYHeVNrjVc",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        944,
+        144
+      ],
+      "id": "ff73c632-b85e-467c-a2d9-c357feca40d5",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst labels = ['A', 'B', 'C', 'D', 'E'];\n\nconst anonymized = {};\nconst answer_map = {};\n\nitems.forEach((item, i) => {\n  const label = labels[i];\n  const answer = item.json.content?.replace(/\\*\\*/g, '') ?? '';\n\n  anonymized[label] = answer;\n  answer_map[label] = answer;\n});\n\nreturn [\n  {\n    json: {\n      anonymized_responses: anonymized,\n      answer_map\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        144
+      ],
+      "id": "1d0d132a-89f2-4168-a251-460652f35594",
+      "name": "Anonymize Responses"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "llama3.1:latest",
+          "mode": "list",
+          "cachedResultName": "llama3.1:latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a strict academic reviewer.\n",
+              "role": "assistant"
+            },
+            {
+              "content": "={{$json.review_prompt}}\n\nAnonymous Answers (JSON):\n{{ JSON.stringify($json.responses, null, 2) }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        -144
+      ],
+      "id": "bd11d491-78d8-40e4-a4d2-e2a089a49a99",
+      "name": "Reviewer_Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0dxlKkFYHeVNrjVc",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{$json.review_prompt}}\n\nAnonymous Answers (JSON):\n{{ JSON.stringify($json.responses, null, 2) }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1472,
+        -336
+      ],
+      "id": "3966e215-46aa-451a-b846-504aba99ef4a",
+      "name": "Reviewer_Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8xdT4Vk3AlUUOadi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eba766ca-dedc-4795-8816-9c32232a848a",
+              "name": "request_id",
+              "value": "={{$node[\"Prepare Review Prompt\"].json.request_id}}",
+              "type": "string"
+            },
+            {
+              "id": "8a5391ac-bfd8-47b9-a52e-213410895933",
+              "name": "reviewer",
+              "value": "\"gemini\"",
+              "type": "string"
+            },
+            {
+              "id": "151844a7-ffa5-4647-b4a1-e5893cdc2a21",
+              "name": "review",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "4e677d9e-d214-4031-ab33-54af5051f4a7",
+              "name": "stage",
+              "value": "\"peer_review\"",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1744,
+        -336
+      ],
+      "id": "7d9de0ec-8e09-4f18-8759-52707b02c69a",
+      "name": "Normalize Gemini Review"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eba766ca-dedc-4795-8816-9c32232a848a",
+              "name": "request_id",
+              "value": "={{$node[\"Prepare Review Prompt\"].json.request_id}}",
+              "type": "string"
+            },
+            {
+              "id": "8a5391ac-bfd8-47b9-a52e-213410895933",
+              "name": "reviewer",
+              "value": "\"ollama\"",
+              "type": "string"
+            },
+            {
+              "id": "151844a7-ffa5-4647-b4a1-e5893cdc2a21",
+              "name": "review",
+              "value": "={{ $json.content }}\n",
+              "type": "string"
+            },
+            {
+              "id": "4e677d9e-d214-4031-ab33-54af5051f4a7",
+              "name": "stage",
+              "value": "\"peer_review\"",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1744,
+        -144
+      ],
+      "id": "b5918a45-ef91-4fb9-b0bb-3e5eb3c9a16c",
+      "name": "Normalize Ollama Review"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Find answer_map from any upstream item that has it\nlet answer_map = {};\nfor (const i of items) {\n  if (i.json.answer_map && Object.keys(i.json.answer_map).length > 0) {\n    answer_map = i.json.answer_map;\n    break;\n  }\n}\n\nreturn [\n  {\n    json: {\n      status: \"peer_review_complete\",\n      request_id: items[0].json.request_id,\n      reviews: items.map(i => i.json),\n      answer_map // 👈 REATTACHED HERE\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        128
+      ],
+      "id": "895573d5-3cb9-408b-ac2a-217332098e43",
+      "name": "Collapse Final Response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9300fd9e-4bce-4420-827a-ed5d088ef430",
+              "name": "request_id",
+              "value": "={{ $node[\"Normalize Input\"].json.request_id }}",
+              "type": "string"
+            },
+            {
+              "id": "17c443d2-6847-4edd-9347-60c046855171",
+              "name": "responses",
+              "value": "={{$json.anonymized_responses}}",
+              "type": "object"
+            },
+            {
+              "id": "f1f48d05-1235-4fb5-9a4f-ddca16b5a611",
+              "name": "review_prompt",
+              "value": "You are acting as an anonymous peer reviewer.  You will be given multiple anonymous answers (A, B, C...) to the same question.  Your task: 1. Rank the answers from best to worst based on:    - Accuracy    - Depth of reasoning    - Clarity 2. Give a short critique for each answer. 3. Do NOT guess the author.  Respond strictly in JSON with this format:  {   \"ranking\": [\"A\", \"B\"],   \"scores\": {     \"A\": 8.5,     \"B\": 7.2   },   \"critiques\": {     \"A\": \"...\",     \"B\": \"...\"   } }",
+              "type": "string"
+            },
+            {
+              "id": "e0776f49-38ea-4a89-a459-39211fe4cb53",
+              "name": "answer_map",
+              "value": "={{ $json.answer_map }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        -256
+      ],
+      "id": "bc29ece9-4c32-4872-8aae-f4e09e9196a4",
+      "name": "Prepare Review Prompt"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1984,
+        -128
+      ],
+      "id": "f702adbf-20ca-4634-86c0-b209f5e42707",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\nconst reviews = item.json.reviews || [];\nconst answer_map = item.json.answer_map || {};\n\n/**\n * Safely extract JSON from LLM text\n */\nfunction extractJSON(text) {\n  if (!text || typeof text !== 'string') return null;\n\n  const cleaned = text\n    .replace(/```json/g, '')\n    .replace(/```/g, '')\n    .trim();\n\n  try {\n    return JSON.parse(cleaned);\n  } catch (e) {\n    return null;\n  }\n}\n\n/**\n * Parse each reviewer output\n */\nconst parsed = reviews.map(r => {\n  const parsedReview = extractJSON(r.review) || {};\n\n  return {\n    json: {\n      request_id: item.json.request_id,\n      reviewer: r.reviewer.replace(/\"/g, ''),\n      ranking: Array.isArray(parsedReview.ranking)\n        ? parsedReview.ranking\n        : [],\n      scores: typeof parsedReview.scores === 'object'\n        ? parsedReview.scores\n        : {},\n      critiques: typeof parsedReview.critiques === 'object'\n        ? parsedReview.critiques\n        : {},\n      answer_map // 👈 CRITICAL: pass forward unchanged\n    }\n  };\n});\n\nreturn parsed;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        128
+      ],
+      "id": "5efa0176-b7ae-433e-b4af-31e4c71797ed",
+      "name": "Parse Gemini / Ollama JSON text"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst answer_map = items[0].json.answer_map || {};\n\nconst voteCounts = {};\nconst scoreSums = {};\nconst scoreCounts = {};\n\n// Collect votes and scores\nitems.forEach(item => {\n  const { ranking = [], scores = {} } = item.json;\n\n  ranking.forEach(label => {\n    voteCounts[label] = (voteCounts[label] || 0) + 1;\n  });\n\n  Object.entries(scores).forEach(([label, score]) => {\n    if (typeof score === 'number') {\n      scoreSums[label] = (scoreSums[label] || 0) + score;\n      scoreCounts[label] = (scoreCounts[label] || 0) + 1;\n    }\n  });\n});\n\n// Compute averages\nconst averages = {};\nObject.keys(scoreSums).forEach(label => {\n  averages[label] = scoreSums[label] / scoreCounts[label];\n});\n\n// Winner = highest average score (tie-safe)\nconst winner = Object.entries(averages)\n  .sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;\n\n// Confidence = proportion of reviewers voting for winner\nconst confidence = winner\n  ? Number(((voteCounts[winner] || 0) / items.length).toFixed(2))\n  : 0;\n\nreturn [\n  {\n    json: {\n      winner,\n      final_answer: answer_map[winner] || \"\",\n      confidence,\n      averages,\n      votes: voteCounts\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        128
+      ],
+      "id": "4bf2d2d1-9bee-48ce-8b68-069aa5b5dd8d",
+      "name": "Consensus Calculator"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "71989e23-e50e-445f-a17e-bc9d0fb6d186",
+              "leftValue": "={{ $json.confidence }}",
+              "rightValue": 0.6,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1392,
+        432
+      ],
+      "id": "60b72067-0349-4fcb-8ddd-7aa0fedd0cb1",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b13e0a25-ac19-48c8-8a31-075804ecff5b",
+              "name": "decision",
+              "value": "accepted",
+              "type": "string"
+            },
+            {
+              "id": "ff12702a-82a4-46e3-8af4-12ba46a55bef",
+              "name": "status",
+              "value": "success",
+              "type": "string"
+            },
+            {
+              "id": "e19b0677-9c78-4f8b-9002-5e9d19f0b323",
+              "name": "answer",
+              "value": "={{ $json.final_answer }}",
+              "type": "string"
+            },
+            {
+              "id": "70ed9b05-8fc0-4e0d-af09-18957d6fb106",
+              "name": "confidence",
+              "value": "={{ Number($json.confidence ?? 0) }}\n",
+              "type": "number"
+            },
+            {
+              "id": "bffb3b56-506e-4fba-9a57-ba566765aaba",
+              "name": "sources",
+              "value": "={{ $json.sources || [] }}\n",
+              "type": "string"
+            },
+            {
+              "id": "2c74cb64-bfac-4f65-85f4-926378a28364",
+              "name": "fallback",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "4e021166-9ca7-4155-ab70-1b7cf27bdcd8",
+              "name": "timestamp",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1616,
+        352
+      ],
+      "id": "da0ee208-a6df-4eff-b44a-67994fea9bdb",
+      "name": "Set – Accepted Response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d37503e1-c23b-4ed4-8bf9-604530376679",
+              "name": "decision",
+              "value": "fallback",
+              "type": "string"
+            },
+            {
+              "id": "afe4b37d-89ed-4bb9-82e0-692d6e52b52d",
+              "name": "status",
+              "value": "low_confidence",
+              "type": "string"
+            },
+            {
+              "id": "0cd6fed4-e8ab-4d12-bed0-56ed44b8b7cd",
+              "name": "answer",
+              "value": "I am not confident enough to answer this accurately. Please rephrase or provide more context.",
+              "type": "string"
+            },
+            {
+              "id": "753678e4-1a38-4222-bad6-41ab9bb537a0",
+              "name": "confidence",
+              "value": "={{ Number($json.confidence ?? 0) }}\n",
+              "type": "number"
+            },
+            {
+              "id": "330632ca-01a6-4985-9dea-6df830235707",
+              "name": "sources",
+              "value": "[]",
+              "type": "array"
+            },
+            {
+              "id": "c7d5bef2-1dc0-467e-bcb1-a31fb3849db5",
+              "name": "fallback",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "5174490c-2809-4540-aec6-57e1b1765e4f",
+              "name": "timestamp",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1616,
+        528
+      ],
+      "id": "043a0750-f545-481a-8d3f-c2cc6e23901f",
+      "name": "Set – Fallback Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1856,
+        432
+      ],
+      "id": "e954eb44-fe1d-4882-a03c-47d8805bcf92",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: $input.first().json\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        128
+      ],
+      "id": "c29693af-aa6f-4f1a-97d0-9218f2edb2a7",
+      "name": "Force Single Item"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1360,
+        128
+      ],
+      "id": "a6803d34-0045-45f8-ab63-8b9698143f45",
+      "name": "Merge2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "Prepare Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Prompt": {
+      "main": [
+        [
+          {
+            "node": "LLM_B_GEMINI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LLM_C_OLLAMA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM_B_GEMINI": {
+      "main": [
+        [
+          {
+            "node": "Normalize Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Gemini": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Ollama": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "LLM_C_OLLAMA": {
+      "main": [
+        [
+          {
+            "node": "Normalize Ollama",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anonymize Responses": {
+      "main": [
+        [
+          {
+            "node": "Prepare Review Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Reviewer_Ollama": {
+      "main": [
+        [
+          {
+            "node": "Normalize Ollama Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reviewer_Gemini": {
+      "main": [
+        [
+          {
+            "node": "Normalize Gemini Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Gemini Review": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Ollama Review": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Prepare Review Prompt": {
+      "main": [
+        [
+          {
+            "node": "Reviewer_Ollama",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reviewer_Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Anonymize Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Gemini / Ollama JSON text": {
+      "main": [
+        [
+          {
+            "node": "Consensus Calculator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consensus Calculator": {
+      "main": [
+        [
+          {
+            "node": "Force Single Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set – Accepted Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set – Fallback Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set – Accepted Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set – Fallback Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Force Single Item": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collapse Final Response": {
+      "main": [
+        [
+          {
+            "node": "Parse Gemini / Ollama JSON text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Collapse Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "665ab297-32e4-435c-aefb-59ec5e78abcc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cca3424cba4aa0b4b911b1e65ee3b413575535942a4e7a06432079e4aa3869e7"
+  },
+  "id": "onqNJ6NwzqGs4kfw",
+  "tags": []
+}
