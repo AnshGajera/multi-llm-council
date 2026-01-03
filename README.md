@@ -35,13 +35,15 @@ This approach mirrors real-world expert panels where diverse perspectives lead t
 
 The system is orchestrated using n8n workflows that coordinate API calls, manage data flow, and implement the review logic.
 
-![Architecture Diagram](diagrams/architecture.png)
+![Architecture Diagram](diagrams/n8n_llms.png)
 
 *The workflow demonstrates parallel LLM invocation, structured review loops, and consensus aggregation.*
 
 ## 🎯 Example Output
 
-See our [workflow screenshot](screenshots/workflow.png) for a visual representation of the n8n automation and [sample output](screenshots/output.png) showing the consensus-building process in action.
+![Workflow Screenshot](screenshots/Screenshot%202026-01-04%20013656.png)
+
+*Visual representation of the n8n workflow demonstrating the multi-LLM council system in action.*
 
 ## 🛠️ Tech Stack
 
